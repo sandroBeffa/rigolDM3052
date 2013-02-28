@@ -1,14 +1,42 @@
+"""This module gives access to some basic functions provided by a RIGOL DM3052 digital
+   multi meter. To communicate with the device, the usbmtc kernel driver is used.
+   The protocol to communicate with the device is ASCII based, the documentation can be found 
+   in the doc folder"""
+
 import os
 import time
+import sys
 
 class usbtmc:
     """Simple implementation of a USBTMC device driver, in the style of visa.h"""
 
     def __init__(self, device):
         self.device = device
-        self.FILE = os.open(device, os.O_RDWR)
+       
+	try:
+		self.FILE = os.open(device, os.O_RDWR)
+	
+	except OSError as e:
+		print e	
+		
+		print "Have you loaded the usbtmc kernel driver?"
+		print "Check with: lsmod | grep usbtmc"
 
-        # TODO: Test that the file opened
+		print "If yes, check permissions of the device file:"
+		print "ls -la /dev | grep usbtmc"
+		print "You should have write and read access:"
+		print "sudo chmod a+rw /dev/usbtmc0"
+
+		print "If not, load the module with:"
+		print "sudo modprobe usbtmc"
+
+		sys.exit(0)
+
+	except Exception as e:
+       		print("oops..an error happend: follwing exception was thrown:")
+		print type(e)
+		sys.exit(0)
+
 
     def write(self, command):
         os.write(self.FILE, command);
@@ -47,9 +75,8 @@ class RigolScope:
 
 
 class RigolDM3000(RigolScope):
+	"""Class to control a Rigol DM3052 digital multimeter"""
 
-
-	
 	numberOfSamples=300
 	sampleTime = 0	
 	
