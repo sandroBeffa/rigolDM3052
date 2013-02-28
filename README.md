@@ -1,7 +1,7 @@
 Intro
 =====
 This python module allows remote control of a RIGOL DM3052 digital multimeter. It bases
-on work done by Matt Mets (see https://github.com/cibomahto/pyusbtmc), and wa heavily extended by
+on work done by Matt Mets (see https://github.com/cibomahto/pyusbtmc), and was heavily extended by
 Sandro Beffa
 
 Most RIGOL devices allow remote control. This python module uses the usbtmc linux 
