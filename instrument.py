@@ -79,6 +79,36 @@ class RigolScope:
         """Reset the instrument"""
         self.meas.sendReset()
 
+class Utility:
+	"""This class provides some useful utility functions"""
+
+	def saveLogToFile(self, log, filename):
+		"""This method takes a log from the datalog and stores
+		   the data to a file"""
+
+		if 'data' in log and 'time' in log:
+			
+			f = open(filename, 'w')			
+			
+			data = log['data']
+			time_data = log['time']
+
+			length = len(data)
+
+			for i in range(length):
+				f.write(str(time_data[i])) 
+				f.write("\t") 
+				f.write(str(data[i]))
+				f.write("\n")
+
+			f.close()
+
+		else:
+			raise ValueError("no time and data key found")
+			sys.exit(0)
+
+
+
 
 class RigolDM3000(RigolScope):
 	"""Class to control a Rigol DM3052 digital multimeter"""
@@ -136,6 +166,8 @@ class RigolDM3000(RigolScope):
         	self.write(":DATAlog:CONFigure:RATE 8")
         	self.write(":DATAlog:RUN")
 
+		print "starting datalog action: taking %s samples" % self.numberOfSamples
+
         	self.write(":DATAlog:RUN?")   
         	status = self.read(20)
 
@@ -149,6 +181,7 @@ class RigolDM3000(RigolScope):
 		data_time = range(steps,self.sampleTime+steps,steps)
 
 		data = self.__getData()
+
 
 		if(len(data_time) != len(data)):
 			print("number of y-elements: %s " % len(data_time))

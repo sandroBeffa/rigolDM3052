@@ -7,13 +7,15 @@ from pylab import *
 
 # Initialize
 dm = instrument.RigolDM3000("/dev/usbtmc0")
-
+util = instrument.Utility()
 
 dm.setNumberOfSamples(600)
 dm.setSamplingMethod("DCI")
 
  
 log = dm.datalog()
+util.saveLogToFile(log, "log.txt")
+
 
 
 fig = figure(1, figsize=(20,5))
