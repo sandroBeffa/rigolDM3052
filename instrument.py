@@ -1,5 +1,5 @@
 """This module gives access to some basic functions provided by a RIGOL DM3052 digital
-   multi meter. To communicate with the device, the usbmtc kernel driver is used.
+   multimeter. To communicate with the device, the usbmtc kernel driver is used.
    The protocol to communicate with the device is ASCII based, the documentation can be found 
    in the doc folder"""
 

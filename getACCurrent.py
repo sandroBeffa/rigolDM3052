@@ -10,7 +10,7 @@ dm = instrument.RigolDM3000("/dev/usbtmc0")
 
 
 dm.setNumberOfSamples(600)
-dm.setSamplingMethod("DCV")
+dm.setSamplingMethod("DCI")
 
  
 log = dm.datalog()
