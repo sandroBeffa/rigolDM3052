@@ -11,7 +11,9 @@ class usbtmc:
     """Simple implementation of a USBTMC device driver, in the style of visa.h"""
 
     def __init__(self, device):
-        self.device = device
+        """check if the usbtmc device file exists"""	
+	
+	self.device = device
        
 	try:
 		self.FILE = os.open(device, os.O_RDWR)
@@ -39,17 +41,21 @@ class usbtmc:
 
 
     def write(self, command):
+	"""send a command"""
         os.write(self.FILE, command);
 
     def read(self, length = 4000):
+	"""read output from the device"""
         return os.read(self.FILE, length)
 
     def getName(self):
+	"""print the exact name and version of the attached device"""
         self.write("*IDN?")
         return self.read(300)
-
+	
     def sendReset(self):
-        self.write("*RST")
+        """reset the device: restore factory defaults"""
+	self.write("*RST")
 
 
 class RigolScope:
@@ -79,14 +85,40 @@ class RigolDM3000(RigolScope):
 
 	numberOfSamples=300
 	sampleTime = 0	
-	
+        
+	samplingMethod = "DCI"	
+	samplingRange = "2"
+
+
+	def setSamplingMethod(self, method):
+		"""set the what should be sampled: dc potential (DCI) or dc current (DCV)"""
+		
+		if method not in ["DCI", "DCV"]:
+			
+			print "got folling value: %s"  % method
+			raise ValueError("allowed methods are: DCI or DCV")
+			sys.exit(0)
+
+		self.samplingMethod = method
+
+	def setSamplingRange(self, maxrange):
+		"""set the maximum range, which can occur during sampling
+		   refer to the documentation for the exact values"""
+
+		if maxrange  not in range(0,4):
+			raise ValueError("range not choosen properly")
+			sys.exit(0)
+
+		self.samplingRange = maxrange
 
 	def setNumberOfSamples(self, samples):
+		"""define the number of samples, which should be taken"""
 		self.numberOfSamples = samples
 		#sample time in mili seconds
                 self.sampleTime = (self.numberOfSamples / 100)*1000		
 
 	def __init__(self, device):
+		"""initialize the rigol dm3052"""
 		RigolScope.__init__(self, device)
 		
 		#sample time in mili seconds
@@ -94,8 +126,11 @@ class RigolDM3000(RigolScope):
 
 
 	def datalog(self):
+		"""start a datalog action: start sampling data and return the result in a
+		   dictionary: log['data'] contains a list with the logged data, log['time'] 
+		   contains a list of the corresponding time values"""
 
-        	self.write(":DATAlog:CONFigure:FUNCtion DCI,2")
+        	self.write(":DATAlog:CONFigure:FUNCtion %s,%s" % (self.samplingMethod, self.samplingRange) ) 
         	self.write(":DATAlog:CONFigure:STARtmode:AUTO")
         	self.write(":DATAlog:CONFigure:STOPmode:NUMber %s" % self.numberOfSamples)
         	self.write(":DATAlog:CONFigure:RATE 8")
@@ -113,7 +148,7 @@ class RigolDM3000(RigolScope):
 		steps = self.sampleTime / self.numberOfSamples
 		data_time = range(steps,self.sampleTime+steps,steps)
 
-		data = self.getData()
+		data = self.__getData()
 
 		if(len(data_time) != len(data)):
 			print("number of y-elements: %s " % len(data_time))
@@ -124,8 +159,8 @@ class RigolDM3000(RigolScope):
 		else:
         		return {"data": data, "time": data_time} 
 
-	def getData(self):
-
+	def __getData(self):
+		"""read the datalog data from the device"""
 
 		processedSamples = self.numberOfSamples
 	
@@ -160,6 +195,7 @@ class RigolDM3000(RigolScope):
 		return l
 
 	def singleMeasure(self):
+		"""make a single measure"""
         	self.write(":FUNCtion:CURRent:DC")
         	self.write(":RESOlution:CURRent:DC 2")
         	self.write(":MEASure:CURRent:DC 2")

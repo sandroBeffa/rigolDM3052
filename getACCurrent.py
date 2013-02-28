@@ -10,12 +10,10 @@ dm = instrument.RigolDM3000("/dev/usbtmc0")
 
 
 dm.setNumberOfSamples(600)
+dm.setSamplingMethod("DCV")
+
  
 log = dm.datalog()
-
-
-#print len(log['time'])
-#print len(log['data'])
 
 
 fig = figure(1, figsize=(20,5))
