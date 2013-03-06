@@ -37,10 +37,6 @@ The better way is to use udev for that.
 Example
 =======
 
-An example for this python module can be found in the getACCurrent.py file.
+An example for this python module can be found in the getDCCurrent.py
 This code samples the DC current.
-
-
-
-
 
