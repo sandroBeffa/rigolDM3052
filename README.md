@@ -27,7 +27,7 @@ Check:
 
 > ls -la /dev | grep usbtmc
 
-If necessary, give change permissions:
+If necessary, change permissions:
 
 > sudo chmod a+rw /dev/usbtmc0
 
